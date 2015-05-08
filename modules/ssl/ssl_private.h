@@ -186,6 +186,7 @@
 
 /* mod_ssl headers */
 #include "ssl_util_ssl.h"
+#include "ssl_engine_verify.h"
 
 APLOG_USE_MODULE(ssl);
 
@@ -587,6 +588,8 @@ typedef struct {
     /** certificate revocation list */
     const char    *crl_path;
     const char    *crl_file;
+    apr_time_t    crl_path_mtime;
+    apr_time_t    crl_file_mtime;
     ssl_crlcheck_t crl_check_mode;
 
 #ifdef HAVE_OCSP_STAPLING
