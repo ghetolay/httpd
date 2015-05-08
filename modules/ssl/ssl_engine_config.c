@@ -120,6 +120,10 @@ static void modssl_ctx_init(modssl_ctx_t *mctx, apr_pool_t *p)
 
     mctx->crl_path            = NULL;
     mctx->crl_file            = NULL;
+    
+    mctx->crl_path_mtime      = NULL;
+    mctx->crl_file_mtime      = NULL;
+    
     mctx->crl_check_mode      = SSL_CRLCHECK_UNSET;
 
     mctx->auth.ca_cert_path   = NULL;
