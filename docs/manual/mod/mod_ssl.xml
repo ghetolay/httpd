@@ -88,6 +88,7 @@ compatibility variables.</p>
 <tr><td><code>SSL_CLIENT_CERT_CHAIN_</code><em>n</em></td> <td>string</td>    <td>PEM-encoded certificates in client certificate chain</td></tr>
 <tr><td><code>SSL_CLIENT_CERT_RFC4523_CEA</code></td>   <td>string</td>    <td>Serial number and issuer of the certificate. The format matches that of the CertificateExactAssertion in RFC4523</td></tr>
 <tr><td><code>SSL_CLIENT_VERIFY</code></td>             <td>string</td>    <td><code>NONE</code>, <code>SUCCESS</code>, <code>GENEROUS</code> or <code>FAILED:</code><em>reason</em></td></tr>
+<tr><td><code>SSL_CLIENT_EXT_KEYUSAGE_</code><em>purpose</em></td> <td>string</td>  <td><code>true</code> if certificate has the corresponding <em>purpose</em> otherwise <code>false</code>.</td></tr>
 <tr><td><code>SSL_SERVER_M_VERSION</code></td>          <td>string</td>    <td>The version of the server certificate</td></tr>
 <tr><td><code>SSL_SERVER_M_SERIAL</code></td>           <td>string</td>    <td>The serial of the server certificate</td></tr>
 <tr><td><code>SSL_SERVER_S_DN</code></td>               <td>string</td>    <td>Subject DN in server's certificate</td></tr>
@@ -101,6 +102,7 @@ compatibility variables.</p>
 <tr><td><code>SSL_SERVER_A_SIG</code></td>              <td>string</td>    <td>Algorithm used for the signature of server's certificate</td></tr>
 <tr><td><code>SSL_SERVER_A_KEY</code></td>              <td>string</td>    <td>Algorithm used for the public key of server's certificate</td></tr>
 <tr><td><code>SSL_SERVER_CERT</code></td>               <td>string</td>    <td>PEM-encoded server certificate</td></tr>
+<tr><td><code>SSL_SERVER_EXT_KEYUSAGE_</code><em>purpose</em></td> <td>string</td>  <td><code>true</code> if certificate has the corresponding <em>purpose</em> otherwise <code>false</code>.</td></tr>
 <tr><td><code>SSL_SRP_USER</code></td>                  <td>string</td>    <td>SRP username</td></tr>
 <tr><td><code>SSL_SRP_USERINFO</code></td>              <td>string</td>    <td>SRP user info</td></tr>
 <tr><td><code>SSL_TLS_SNI</code></td>                   <td>string</td>    <td>Contents of the SNI TLS extension (if supplied with ClientHello)</td></tr>
@@ -122,6 +124,17 @@ the <code>StdEnvVars</code> option of
 the <directive module="mod_ssl">SSLOptions</directive> directive, the
 first (or only) attribute of any DN is added only under a non-suffixed
 name; i.e. no <code>_0</code> suffixed entries are added.</p>
+
+<p><em>purpose</em> specifies an extended key usage value either as a 
+shortname or as an oid. Shortname are case insensitive. Since dots aren't 
+permit on variable name if <em>purpose</em> define an oid all <code>'.'</code> should 
+be replace with <code>'_'</code>. Theses are all valid values : 
+<code>SSL_CLIENT_EXT_KEYUSAGE_clientAuth</code>, 
+<code>SSL_CLIENT_EXT_KEYUSAGE_CLIENTAUTH</code>, 
+<code>SSL_CLIENT_EXT_KEYUSAGE_1_3_6_1_5_5_7_3_2</code>. RFC5280 stipulate 
+that <em>extended key usage extension</em> must be consistent with 
+<em>key usage extension</em> but no check of such are done here.
+</p>
 
 <p>The format of the <em>*_DN</em> variables has changed in Apache HTTPD
 2.3.11. See the <code>LegacyDNStringFormat</code> option for

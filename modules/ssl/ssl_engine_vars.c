@@ -43,6 +43,7 @@ static char *ssl_var_lookup_ssl(apr_pool_t *p, conn_rec *c, request_rec *r, char
 static char *ssl_var_lookup_ssl_cert(apr_pool_t *p, request_rec *r, X509 *xs, char *var);
 static char *ssl_var_lookup_ssl_cert_dn(apr_pool_t *p, X509_NAME *xsname, char *var);
 static char *ssl_var_lookup_ssl_cert_san(apr_pool_t *p, X509 *xs, char *var);
+static char *ssl_var_lookup_ssl_cert_ext_keyusage(apr_pool_t *p, X509 *xs, char *var);
 static char *ssl_var_lookup_ssl_cert_valid(apr_pool_t *p, ASN1_TIME *tm);
 static char *ssl_var_lookup_ssl_cert_remain(apr_pool_t *p, ASN1_TIME *tm);
 static char *ssl_var_lookup_ssl_cert_serial(apr_pool_t *p, X509 *xs);
@@ -518,6 +519,9 @@ static char *ssl_var_lookup_ssl_cert(apr_pool_t *p, request_rec *r, X509 *xs,
     else if (strcEQ(var, "CERT")) {
         result = ssl_var_lookup_ssl_cert_PEM(p, xs);
     }
+    else if (strlen(var) > 13 && strcEQn(var, "EXT_KEYUSAGE_", 13)) {
+        result = ssl_var_lookup_ssl_cert_ext_keyusage(p, xs, var+13);
+    }
 
     if (resdup)
         result = apr_pstrdup(p, result);
@@ -617,6 +621,35 @@ static char *ssl_var_lookup_ssl_cert_san(apr_pool_t *p, X509 *xs, char *var)
        return APR_ARRAY_IDX(entries, 0, char *);
     else
        return NULL;
+}
+
+static char * ssl_var_lookup_ssl_cert_ext_keyusage(apr_pool_t *p, X509 *xs, char *var)
+{
+    char *oid = apr_pcalloc(p, 128);
+    EXTENDED_KEY_USAGE *extusage;
+    
+    if( (extusage = X509_get_ext_d2i(xs, NID_ext_key_usage, NULL, NULL)) ){
+        for (int i = 0; i < sk_ASN1_OBJECT_num(extusage); i++) {
+            ASN1_OBJECT *obj = sk_ASN1_OBJECT_value(extusage, i);
+            int nid = OBJ_obj2nid(obj);
+
+            if(apr_strnatcasecmp(var, OBJ_nid2sn(nid)) == 0)
+                return "true";
+
+            //convert _ into . for oid
+            for(int j = 0; var[j]; j++)
+                if(var[j] == '_')
+                    var[j] = '.';
+
+            OBJ_obj2txt(oid, 128, obj, 1);
+            if(apr_strnatcasecmp(var, oid) == 0)
+                return "true";
+        }
+
+        sk_ASN1_OBJECT_pop_free(extusage, ASN1_OBJECT_free);
+    }
+
+    return "false";
 }
 
 static char *ssl_var_lookup_ssl_cert_valid(apr_pool_t *p, ASN1_TIME *tm)
