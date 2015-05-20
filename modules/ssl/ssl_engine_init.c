@@ -658,9 +658,7 @@ static apr_status_t ssl_init_ctx_verify(server_rec *s,
         verify |= SSL_VERIFY_PEER;
     }
 
-    /*SSL_CTX_set_verify(ctx, verify, ssl_callback_SSLVerify);*/
-    SSL_CTX_set_verify(ctx, verify, ssl_verify_error);
-    SSL_CTX_set_cert_verify_callback(ctx, ssl_verify, NULL);
+    SSL_CTX_set_verify(ctx, verify, ssl_callback_SSLVerify);
 
     /*
      * Configure Client Authentication details

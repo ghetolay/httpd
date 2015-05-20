@@ -23,7 +23,6 @@ ssl_engine_config.lo dnl
 ssl_engine_init.lo dnl
 ssl_engine_io.lo dnl
 ssl_engine_kernel.lo dnl
-ssl_engine_verify.lo dnl
 ssl_engine_log.lo dnl
 ssl_engine_mutex.lo dnl
 ssl_engine_pphrase.lo dnl
